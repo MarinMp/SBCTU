@@ -1,138 +1,138 @@
 -- 01_creacion_tablas.sql
 -- Proyecto Final - Bases de Datos 1
--- Sistema de Base de Conocimientos para Triage en Urgencias (SBCTU)
+-- Sistema de Base de Conocimientos para Triage en Urgencias (sbctu)
 -- Crea la base de datos y todas las tablas principales
 -- Motor: MySQL (Workbench 8.0+)
 
 -- Elimina la base si ya existe y crea una nueva
-DROP DATABASE IF EXISTS SBCTU;
-CREATE DATABASE SBCTU CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE SBCTU;
+DROP DATABASE if exists sbctu;
+CREATE DATABASE sbctu character SET utf8mb4 collate utf8mb4_0900_ai_ci;
+USE sbctu;
 
--- TABLA: PACIENTE
+-- tabla: paciente
 -- Guarda la información personal y de contacto
-CREATE TABLE PACIENTE (
-  ID_PACIENTE INT AUTO_INCREMENT PRIMARY KEY,
-  PRIMER_NOMBRE VARCHAR(15) NOT NULL,
-  SEGUNDO_NOMBRE VARCHAR(15),
-  PRIMER_APELLIDO VARCHAR(15) NOT NULL,
-  SEGUNDO_APELLIDO VARCHAR(15),
-  FECHA_NACIMIENTO DATE NOT NULL,
-  GENERO CHAR(1) NOT NULL,
-  DIRECCION VARCHAR(50),
-  CORREO VARCHAR(100) NOT NULL UNIQUE
+CREATE TABLE paciente (
+  id_paciente INT AUTO_INCREMENT PRIMARY KEY,
+  primer_nombre VARCHAR(15) NOT NULL,
+  segundo_nombre VARCHAR(15),
+  primer_apellido VARCHAR(15) NOT NULL,
+  segundo_apellido VARCHAR(15),
+  fecha_nacimiento DATE NOT NULL,
+  genero CHAR(1) NOT NULL,
+  direccion VARCHAR(50),
+  correo VARCHAR(100) NOT NULL UNIQUE
 );
 
--- TABLA: PERSONAL_MEDICO
+-- tabla: personal_medico
 -- Médicos o enfermeros que realizan triages y diagnósticos
-CREATE TABLE PERSONAL_MEDICO (
-  ID_PERSONAL INT AUTO_INCREMENT PRIMARY KEY,
-  PRIMER_NOMBRE VARCHAR(15) NOT NULL,
-  SEGUNDO_NOMBRE VARCHAR(15),
-  PRIMER_APELLIDO VARCHAR(15) NOT NULL,
-  SEGUNDO_APELLIDO VARCHAR(15),
-  NUMERO_LICENCIA VARCHAR(30) NOT NULL UNIQUE,
-  CARGO VARCHAR(20) NOT NULL,
-  CORREO_INSTITUCIONAL VARCHAR(100) NOT NULL UNIQUE
+CREATE TABLE personal_medico (
+  id_personal INT AUTO_INCREMENT PRIMARY KEY,
+  primer_nombre VARCHAR(15) NOT NULL,
+  segundo_nombre VARCHAR(15),
+  primer_apellido VARCHAR(15) NOT NULL,
+  segundo_apellido VARCHAR(15),
+  numero_licencia VARCHAR(30) NOT NULL UNIQUE,
+  cargo VARCHAR(20) NOT NULL,
+  correo_institucional VARCHAR(100) NOT NULL UNIQUE
 );
 
--- TABLA: NIVEL_URGENCIA
+-- tabla: nivel_urgencia
 -- Define la prioridad de atención (1 Crítico - 4 Leve)
-CREATE TABLE NIVEL_URGENCIA (
-  ID_NIVEL_URGENCIA INT AUTO_INCREMENT PRIMARY KEY,
-  CODIGO_NIVEL TINYINT NOT NULL UNIQUE,
-  DESCRIPCION VARCHAR(30) NOT NULL
+CREATE TABLE nivel_urgencia (
+  id_nivel_urgencia INT AUTO_INCREMENT PRIMARY KEY,
+  codigo_nivel TINYINT NOT NULL UNIQUE,
+  descripcion VARCHAR(30) NOT NULL
 );
 
--- TABLA: ENFERMEDAD
+-- tabla: enfermedad
 -- Registra las enfermedades conocidas en la base de conocimiento
-CREATE TABLE ENFERMEDAD (
-  ID_ENFERMEDAD INT AUTO_INCREMENT PRIMARY KEY,
-  NOMBRE_ENFERMEDAD VARCHAR(50) NOT NULL,
-  DESCRIPCION VARCHAR(100),
-  CODIGO_ENFERMEDAD INT NOT NULL UNIQUE,
-  TRATAMIENTO VARCHAR(100),
-  OBSERVACIONES VARCHAR(100),
-  CATEGORIA VARCHAR(30) NOT NULL
+CREATE TABLE enfermedad (
+  id_enfermedad INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_enfermedad VARCHAR(50) NOT NULL,
+  descripcion VARCHAR(100),
+  codigo_enfermedad INT NOT NULL UNIQUE,
+  tratamiento VARCHAR(100),
+  observaciones VARCHAR(100),
+  categoria VARCHAR(30) NOT NULL
 );
 
--- TABLA: SINTOMA
+-- tabla: sintoma
 -- Lista de síntomas observados en los pacientes
-CREATE TABLE SINTOMA (
-  ID_SINTOMA INT AUTO_INCREMENT PRIMARY KEY,
-  NOMBRE_SINTOMA VARCHAR(100) NOT NULL,
-  DESCRIPCION VARCHAR(100)
+CREATE TABLE sintoma (
+  id_sintoma INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_sintoma VARCHAR(100) NOT NULL,
+  descripcion VARCHAR(100)
 );
 
--- TABLA: ENFERMEDAD_SINTOMA
+-- tabla: enfermedad_sintoma
 -- Relación muchos a muchos entre enfermedades y síntomas
-CREATE TABLE ENFERMEDAD_SINTOMA (
-  SINTOMA_ID_SINTOMA INT NOT NULL,
-  ENFERMEDAD_ID_ENFERMEDAD INT NOT NULL,
-  PRIMARY KEY (SINTOMA_ID_SINTOMA, ENFERMEDAD_ID_ENFERMEDAD),
-  CONSTRAINT FK_ENF_SIN_SINTOMA FOREIGN KEY (SINTOMA_ID_SINTOMA) REFERENCES SINTOMA(ID_SINTOMA),
-  CONSTRAINT FK_ENF_SIN_ENFERMEDAD FOREIGN KEY (ENFERMEDAD_ID_ENFERMEDAD) REFERENCES ENFERMEDAD(ID_ENFERMEDAD)
+CREATE TABLE enfermedad_sintoma (
+  sintoma_id_sintoma INT NOT NULL,
+  enfermedad_id_enfermedad INT NOT NULL,
+  PRIMARY KEY (sintoma_id_sintoma, enfermedad_id_enfermedad),
+  CONSTRAINT fk_enf_sin_sintoma FOREIGN KEY (sintoma_id_sintoma) REFERENCES sintoma(id_sintoma),
+  CONSTRAINT fk_enf_sin_enfermedad FOREIGN KEY (enfermedad_id_enfermedad) REFERENCES enfermedad(id_enfermedad)
 );
 
--- TABLA: VISITA
+-- tabla: visita
 -- Cada ingreso de un paciente al área de urgencias
-CREATE TABLE VISITA (
-  ID_VISITA INT AUTO_INCREMENT PRIMARY KEY,
-  FECHA_VISITA DATE NOT NULL,
-  HORA_VISITA TIME NOT NULL,
-  MOTIVO_CONSULTA VARCHAR(200) NOT NULL,
-  ESTADO_VISITA VARCHAR(20) NOT NULL,
-  PACIENTE_ID_PACIENTE INT NOT NULL,
-  TRIAGE_ID_TRIAGE INT NULL,
-  CONSTRAINT FK_VISITA_PACIENTE FOREIGN KEY (PACIENTE_ID_PACIENTE)
-    REFERENCES PACIENTE(ID_PACIENTE)
+CREATE TABLE visita (
+  id_visita INT AUTO_INCREMENT PRIMARY KEY,
+  fecha_visita DATE NOT NULL,
+  hora_visita TIME NOT NULL,
+  motivo_consulta VARCHAR(200) NOT NULL,
+  estado_visita VARCHAR(20) NOT NULL,
+  paciente_id_paciente INT NOT NULL,
+  triage_id_triage INT NULL,
+  CONSTRAINT fk_visita_paciente FOREIGN KEY (paciente_id_paciente)
+    REFERENCES paciente(id_paciente)
 );
 
--- TABLA: TRIAGE
+-- tabla: triage
 -- Evaluación inicial realizada al paciente
-CREATE TABLE TRIAGE (
-  ID_TRIAGE INT AUTO_INCREMENT PRIMARY KEY,
-  OBSERVACIONES VARCHAR(100) NOT NULL,
-  CONSTANTES_VITALES VARCHAR(100) NOT NULL,
-  HORA_ATENCION TIME NOT NULL,
-  VISITA_ID_VISITA INT NOT NULL,
-  PERSONAL_MEDICO_ID_PERSONAL INT NOT NULL,
-  NIVEL_URGENCIA_ID_NIVEL_URGENCIA INT NOT NULL,
-  CONSTRAINT FK_TRIAGE_VISITA FOREIGN KEY (VISITA_ID_VISITA) REFERENCES VISITA(ID_VISITA),
-  CONSTRAINT FK_TRIAGE_PERSONAL FOREIGN KEY (PERSONAL_MEDICO_ID_PERSONAL) REFERENCES PERSONAL_MEDICO(ID_PERSONAL),
-  CONSTRAINT FK_TRIAGE_NIVEL FOREIGN KEY (NIVEL_URGENCIA_ID_NIVEL_URGENCIA) REFERENCES NIVEL_URGENCIA(ID_NIVEL_URGENCIA)
+CREATE TABLE triage (
+  id_triage INT AUTO_INCREMENT PRIMARY KEY,
+  observaciones VARCHAR(100) NOT NULL,
+  constantes_vitales VARCHAR(100) NOT NULL,
+  hora_atencion TIME NOT NULL,
+  visita_id_visita INT NOT NULL,
+  personal_medico_id_personal INT NOT NULL,
+  nivel_urgencia_id_nivel_urgencia INT NOT NULL,
+  CONSTRAINT fk_triage_visita FOREIGN KEY (visita_id_visita) REFERENCES visita(id_visita),
+  CONSTRAINT fk_triage_personal FOREIGN KEY (personal_medico_id_personal) REFERENCES personal_medico(id_personal),
+  CONSTRAINT fk_triage_nivel FOREIGN KEY (nivel_urgencia_id_nivel_urgencia) REFERENCES nivel_urgencia(id_nivel_urgencia)
 );
 
--- CLAVE FORÁNEA CRUZADA VISITA–TRIAGE
+-- clave FORÁNEA cruzada visita–triage
 -- Se agrega después para evitar errores de referencia circular
-ALTER TABLE VISITA
-ADD CONSTRAINT FK_VISITA_TRIAGE
-FOREIGN KEY (TRIAGE_ID_TRIAGE)
-REFERENCES TRIAGE(ID_TRIAGE);
+alter TABLE visita
+add CONSTRAINT fk_visita_triage
+FOREIGN KEY (triage_id_triage)
+REFERENCES triage(id_triage);
 
--- TABLA: TRIAGE_SINTOMA
+-- tabla: triage_sintoma
 -- Relaciona los síntomas observados durante un triage
-CREATE TABLE TRIAGE_SINTOMA (
-  TRIAGE_ID_TRIAGE INT NOT NULL,
-  SINTOMA_ID_SINTOMA INT NOT NULL,
-  PRIMARY KEY (TRIAGE_ID_TRIAGE, SINTOMA_ID_SINTOMA),
-  CONSTRAINT FK_TRIAGE_SINTOMA_TRIAGE FOREIGN KEY (TRIAGE_ID_TRIAGE) REFERENCES TRIAGE(ID_TRIAGE),
-  CONSTRAINT FK_TRIAGE_SINTOMA_SINTOMA FOREIGN KEY (SINTOMA_ID_SINTOMA) REFERENCES SINTOMA(ID_SINTOMA)
+CREATE TABLE triage_sintoma (
+  triage_id_triage INT NOT NULL,
+  sintoma_id_sintoma INT NOT NULL,
+  PRIMARY KEY (triage_id_triage, sintoma_id_sintoma),
+  CONSTRAINT fk_triage_sintoma_triage FOREIGN KEY (triage_id_triage) REFERENCES triage(id_triage),
+  CONSTRAINT fk_triage_sintoma_sintoma FOREIGN KEY (sintoma_id_sintoma) REFERENCES sintoma(id_sintoma)
 );
 
--- TABLA: DIAGNOSTICO
+-- tabla: diagnostico
 -- Resultado médico emitido tras la evaluación
-CREATE TABLE DIAGNOSTICO (
-  ID_DIAGNOSTICO INT AUTO_INCREMENT PRIMARY KEY,
-  FECHA_DIAGNOSTICO DATE NOT NULL,
-  TIPO_DIAGNOSTICO VARCHAR(20) NOT NULL,
-  OBSERVACIONES VARCHAR(100),
-  ENFERMEDAD_ID_ENFERMEDAD INT NOT NULL,
-  TRIAGE_ID_TRIAGE INT NOT NULL,
-  PERSONAL_MEDICO_ID_PERSONAL INT NOT NULL,
-  NIVEL_URGENCIA_ID_NIVEL_URGENCIA INT NOT NULL,
-  CONSTRAINT FK_DIAG_ENFERMEDAD FOREIGN KEY (ENFERMEDAD_ID_ENFERMEDAD) REFERENCES ENFERMEDAD(ID_ENFERMEDAD),
-  CONSTRAINT FK_DIAG_TRIAGE FOREIGN KEY (TRIAGE_ID_TRIAGE) REFERENCES TRIAGE(ID_TRIAGE),
-  CONSTRAINT FK_DIAG_PERSONAL FOREIGN KEY (PERSONAL_MEDICO_ID_PERSONAL) REFERENCES PERSONAL_MEDICO(ID_PERSONAL),
-  CONSTRAINT FK_DIAG_NIVEL FOREIGN KEY (NIVEL_URGENCIA_ID_NIVEL_URGENCIA) REFERENCES NIVEL_URGENCIA(ID_NIVEL_URGENCIA)
+CREATE TABLE diagnostico (
+  id_diagnostico INT AUTO_INCREMENT PRIMARY KEY,
+  fecha_diagnostico DATE NOT NULL,
+  tipo_diagnostico VARCHAR(20) NOT NULL,
+  observaciones VARCHAR(100),
+  enfermedad_id_enfermedad INT NOT NULL,
+  triage_id_triage INT NOT NULL,
+  personal_medico_id_personal INT NOT NULL,
+  nivel_urgencia_id_nivel_urgencia INT NOT NULL,
+  CONSTRAINT fk_diag_enfermedad FOREIGN KEY (enfermedad_id_enfermedad) REFERENCES enfermedad(id_enfermedad),
+  CONSTRAINT fk_diag_triage FOREIGN KEY (triage_id_triage) REFERENCES triage(id_triage),
+  CONSTRAINT fk_diag_personal FOREIGN KEY (personal_medico_id_personal) REFERENCES personal_medico(id_personal),
+  CONSTRAINT fk_diag_nivel FOREIGN KEY (nivel_urgencia_id_nivel_urgencia) REFERENCES nivel_urgencia(id_nivel_urgencia)
 );
