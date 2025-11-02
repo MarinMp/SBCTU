@@ -19,6 +19,7 @@ public class EnfermedadService {
 
     public EnfermedadService(EnfermedadRepository enfermedadRepository) {
         this.enfermedadRepository = enfermedadRepository;
+
     }
 
     // Registrar una nueva enfermedad
