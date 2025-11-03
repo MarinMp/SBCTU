@@ -1,0 +1,242 @@
+/* === SBCTU Sidebar Styles === */
+.sbctu-sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Brand Section */
+.sbctu-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.sbctu-brand-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.sbctu-brand-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* Navigation */
+.sbctu-sidebar-nav {
+  flex: 1;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sbctu-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.sbctu-nav-link:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.sbctu-nav-link.active {
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.sbctu-nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: #3b82f6;
+  border-radius: 0 2px 2px 0;
+}
+
+.sbctu-nav-icon {
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+}
+
+.sbctu-nav-label {
+  flex: 1;
+}
+
+/* Upgrade Section */
+.sbctu-sidebar-upgrade {
+  margin: 1rem 0.75rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sbctu-sidebar-upgrade::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.sbctu-upgrade-content {
+  position: relative;
+  z-index: 1;
+}
+
+.sbctu-upgrade-content h6 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+}
+
+.sbctu-upgrade-content p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+.sbctu-upgrade-btn {
+  width: 100%;
+  padding: 0.625rem;
+  background: white;
+  color: #1e293b;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sbctu-upgrade-btn:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+/* Footer */
+.sbctu-sidebar-footer {
+  padding: 1rem 0.75rem;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sbctu-footer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sbctu-footer-link:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.sbctu-footer-link.logout {
+  color: #ef4444;
+}
+
+.sbctu-footer-link.logout:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.sbctu-footer-link svg {
+  font-size: 1.125rem;
+}
+
+/* Scrollbar */
+.sbctu-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sbctu-sidebar::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 3px;
+}
+
+.sbctu-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sbctu-sidebar {
+    width: 70px;
+  }
+
+  .sbctu-brand-name,
+  .sbctu-nav-label,
+  .sbctu-upgrade-content,
+  .sbctu-footer-link span {
+    display: none;
+  }
+
+  .sbctu-sidebar-brand {
+    justify-content: center;
+  }
+
+  .sbctu-nav-link,
+  .sbctu-footer-link {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .sbctu-sidebar-upgrade {
+    padding: 0.75rem;
+  }
+}
