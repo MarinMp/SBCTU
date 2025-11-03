@@ -1,0 +1,75 @@
+/* App Layout */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  flex: 1;
+  padding: 0;
+  background: #f8f9fa;
+}
+
+/* Ajustes para el Dashboard */
+.content-wrapper .dashboard-wrapper {
+  padding: 2rem;
+  background: transparent;
+}
+
+/* Navbar dentro del main-content */
+.main-content .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 70px;
+  }
+
+  .content-wrapper .dashboard-wrapper {
+    padding: 1rem;
+  }
+
+  .main-content .navbar {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  .modern-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .modern-sidebar.active {
+    transform: translateX(0);
+  }
+}
+.main-content {
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
