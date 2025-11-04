@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, Spinner } from "react-bootstrap";
+import { FaUserMd, FaPlus, FaEdit, FaTrash, FaEnvelope, FaIdBadge, FaBriefcase } from "react-icons/fa";
 import PersonalMedicoService from "../services/PersonalMedicoService";
+import "../styles/table-cards.css";
 
 function PersonalMedico() {
   const [personal, setPersonal] = useState([]);
@@ -87,70 +89,112 @@ function PersonalMedico() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-center">Gestión del Personal Médico</h2>
+  // Colores para avatares según cargo
+  const getAvatarColorByCargo = (cargo) => {
+    const cargoLower = cargo?.toLowerCase() || '';
+    if (cargoLower.includes('doctor') || cargoLower.includes('médico')) return 'avatar-blue';
+    if (cargoLower.includes('enfermera') || cargoLower.includes('enfermero')) return 'avatar-green';
+    if (cargoLower.includes('especialista')) return 'avatar-purple';
+    if (cargoLower.includes('auxiliar')) return 'avatar-orange';
+    return 'avatar-pink';
+  };
 
-      <div className="text-end mb-3">
-        <Button variant="success" onClick={() => abrirModal("nuevo")}>
-          + Nuevo Personal Médico
-        </Button>
+  return (
+    <div className="table-cards-container">
+      {/* Header */}
+      <div className="table-cards-header">
+        <h2 className="table-cards-title">Gestión del Personal Médico</h2>
+        <div className="table-cards-actions">
+          <button className="btn-add" onClick={() => abrirModal("nuevo")}>
+            <FaPlus /> Nuevo Personal
+          </button>
+        </div>
       </div>
 
+      {/* Loading */}
       {loading ? (
-        <div className="text-center mt-4">
-          <Spinner animation="border" />
-          <p className="mt-2">Cargando registros...</p>
+        <div className="table-cards-loading">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3" style={{ color: '#64748b' }}>Cargando personal médico...</p>
+        </div>
+      ) : personal.length === 0 ? (
+        /* Estado vacío */
+        <div className="table-cards-empty">
+          <div className="table-cards-empty-icon">
+            <FaUserMd />
+          </div>
+          <h5 className="table-cards-empty-title">No hay personal médico registrado</h5>
+          <p className="table-cards-empty-text">
+            Comienza agregando el primer miembro del personal médico
+          </p>
         </div>
       ) : (
-        <table className="table table-striped align-middle">
-          <thead className="table-primary">
-            <tr>
-              <th>ID</th>
-              <th>Nombre Completo</th>
-              <th>N° Licencia</th>
-              <th>Cargo</th>
-              <th>Correo Institucional</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {personal.length > 0 ? (
-              personal.map((p) => (
-                <tr key={p.idPersonal}>
-                  <td>{p.idPersonal}</td>
-                  <td>{`${p.primerNombre} ${p.segundoNombre || ""} ${p.primerApellido} ${p.segundoApellido || ""}`}</td>
-                  <td>{p.numeroLicencia}</td>
-                  <td>{p.cargo}</td>
-                  <td>{p.correoInstitucional}</td>
-                  <td>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => abrirModal("editar", p)}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => eliminarPersonal(p.idPersonal)}
-                    >
-                      Eliminar
-                    </Button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center text-muted">
-                  No hay personal registrado.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        /* Lista de Cards */
+        <div className="table-cards-list">
+          {personal.map((p) => (
+            <div key={p.idPersonal} className="table-card-item">
+              {/* Avatar */}
+              <div className={`table-card-avatar ${getAvatarColorByCargo(p.cargo)}`}>
+                <FaUserMd />
+              </div>
+
+              {/* Contenido */}
+              <div className="table-card-content">
+                {/* Información principal */}
+                <div className="table-card-info">
+                  <h6 className="table-card-name">
+                    {p.primerNombre} {p.segundoNombre || ''} {p.primerApellido} {p.segundoApellido || ''}
+                  </h6>
+                  <p className="table-card-detail">
+                    <FaEnvelope /> {p.correoInstitucional}
+                  </p>
+                </div>
+
+                {/* Columna: Licencia */}
+                <div className="table-card-column">
+                  <span className="table-card-column-label">Licencia</span>
+                  <span className="table-card-column-value">
+                    <FaIdBadge style={{ marginRight: '0.5rem', color: '#64748b' }} />
+                    {p.numeroLicencia}
+                  </span>
+                </div>
+
+                {/* Columna: Cargo */}
+                <div className="table-card-column">
+                  <span className="table-card-column-label">Cargo</span>
+                  <span className="table-card-badge badge-activo">
+                    <FaBriefcase style={{ marginRight: '0.5rem' }} />
+                    {p.cargo}
+                  </span>
+                </div>
+
+                {/* Columna: ID */}
+                <div className="table-card-column">
+                  <span className="table-card-column-label">ID</span>
+                  <span className="table-card-column-value">#{p.idPersonal}</span>
+                </div>
+              </div>
+
+              {/* Acciones */}
+              <div className="table-card-actions">
+                <button
+                  className="btn-action btn-edit"
+                  onClick={() => abrirModal("editar", p)}
+                  title="Editar"
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  className="btn-action btn-delete"
+                  onClick={() => eliminarPersonal(p.idPersonal)}
+                  title="Eliminar"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Modal */}

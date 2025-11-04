@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, Spinner } from "react-bootstrap";
+import { FaUserInjured, FaPlus, FaEdit, FaTrash, FaEnvelope, FaIdCard, FaVenusMars } from "react-icons/fa";
 import PacienteService from "../services/PacienteService";
 import Notify from "../components/Notify";
+import "../styles/table-cards.css";
 
 function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -28,7 +30,6 @@ function Pacientes() {
   });
 
   // === UTILIDADES DE LOCALSTORAGE ===
-
   const obtenerDocumentosLocales = () => {
     const data = localStorage.getItem("documentosPacientes");
     return data ? JSON.parse(data) : {};
@@ -44,21 +45,18 @@ function Pacientes() {
       setLoading(true);
       const data = await PacienteService.listar();
 
-      // Obtener mapa de documentos locales existentes
       const docsLocales = obtenerDocumentosLocales();
       let nuevosDocs = { ...docsLocales };
 
-      // Asignar número aleatorio si no existe
       data.forEach((pac) => {
         if (!nuevosDocs[pac.idPaciente]) {
-          const aleatorio = Math.floor(Math.random() * 90000000) + 10000000; // 8 dígitos
+          const aleatorio = Math.floor(Math.random() * 90000000) + 10000000;
           nuevosDocs[pac.idPaciente] = aleatorio;
         }
       });
 
       guardarDocumentosLocales(nuevosDocs);
 
-      // Adjuntar número al objeto mostrado
       const dataConDoc = data.map((p) => ({
         ...p,
         numeroDocumento: nuevosDocs[p.idPaciente],
@@ -105,7 +103,6 @@ function Pacientes() {
       const documentosLocales = obtenerDocumentosLocales();
       const listaDocs = Object.values(documentosLocales);
 
-      // Validar duplicado local
       if (!modoEdicion && listaDocs.includes(Number(formData.numeroDocumento))) {
         setNotify({
           show: true,
@@ -115,7 +112,6 @@ function Pacientes() {
         return;
       }
 
-      // Validar correo duplicado (backend)
       const existeCorreo = pacientes.some(
         (p) => p.correo.toLowerCase() === formData.correo.toLowerCase()
       );
@@ -128,7 +124,6 @@ function Pacientes() {
         return;
       }
 
-      // === Registro o actualización ===
       if (modoEdicion) {
         await PacienteService.actualizar(pacienteEditando.idPaciente, formData);
         setNotify({
@@ -139,7 +134,6 @@ function Pacientes() {
       } else {
         const nuevo = await PacienteService.registrar(formData);
 
-        // Asignar documento local simulado
         const docs = obtenerDocumentosLocales();
         const docNuevo =
           formData.numeroDocumento ||
@@ -197,9 +191,21 @@ function Pacientes() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Colores aleatorios para avatares
+  const avatarColors = ['avatar-blue', 'avatar-green', 'avatar-purple', 'avatar-orange', 'avatar-pink'];
+  const getAvatarColor = (id) => avatarColors[id % avatarColors.length];
+
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-center">Gestión de Pacientes</h2>
+    <div className="table-cards-container">
+      {/* Header */}
+      <div className="table-cards-header">
+        <h2 className="table-cards-title">Gestión de Pacientes</h2>
+        <div className="table-cards-actions">
+          <button className="btn-add" onClick={() => abrirModal("nuevo")}>
+            <FaPlus /> Nuevo Paciente
+          </button>
+        </div>
+      </div>
 
       {/* Notify */}
       <Notify
@@ -209,68 +215,91 @@ function Pacientes() {
         type={notify.type}
       />
 
-      <div className="text-end mb-3">
-        <Button variant="success" onClick={() => abrirModal("nuevo")}>
-          + Nuevo Paciente
-        </Button>
-      </div>
-
+      {/* Loading */}
       {loading ? (
-        <div className="text-center mt-4">
-          <Spinner animation="border" />
-          <p className="mt-2">Cargando pacientes...</p>
+        <div className="table-cards-loading">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3" style={{ color: '#64748b' }}>Cargando pacientes...</p>
+        </div>
+      ) : pacientes.length === 0 ? (
+        /* Estado vacío */
+        <div className="table-cards-empty">
+          <div className="table-cards-empty-icon">
+            <FaUserInjured />
+          </div>
+          <h5 className="table-cards-empty-title">No hay pacientes registrados</h5>
+          <p className="table-cards-empty-text">
+            Comienza agregando tu primer paciente haciendo clic en el botón "Nuevo Paciente"
+          </p>
         </div>
       ) : (
-        <table className="table table-striped align-middle table-hover shadow-sm">
-          <thead className="table-primary">
-            <tr>
-              <th>ID</th>
-              <th>Documento</th>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Género</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pacientes.length > 0 ? (
-              pacientes.map((p) => (
-                <tr key={p.idPaciente}>
-                  <td>{p.idPaciente}</td>
-                  <td>{p.numeroDocumento || "—"}</td>
-                  <td>
-                    {p.primerNombre} {p.primerApellido}
-                  </td>
-                  <td>{p.correo}</td>
-                  <td>{p.genero}</td>
-                  <td>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => abrirModal("editar", p)}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => eliminarPaciente(p.idPaciente)}
-                    >
-                      Eliminar
-                    </Button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center text-muted">
-                  No hay pacientes registrados.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        /* Lista de Cards */
+        <div className="table-cards-list">
+          {pacientes.map((p) => (
+            <div key={p.idPaciente} className="table-card-item">
+              {/* Avatar */}
+              <div className={`table-card-avatar ${getAvatarColor(p.idPaciente)}`}>
+                <FaUserInjured />
+              </div>
+
+              {/* Contenido */}
+              <div className="table-card-content">
+                {/* Información principal */}
+                <div className="table-card-info">
+                  <h6 className="table-card-name">
+                    {p.primerNombre} {p.primerApellido} {p.segundoApellido}
+                  </h6>
+                  <p className="table-card-detail">
+                    <FaEnvelope /> {p.correo}
+                  </p>
+                </div>
+
+                {/* Columna: Documento */}
+                <div className="table-card-column">
+                  <span className="table-card-column-label">Documento</span>
+                  <span className="table-card-column-value">
+                    <FaIdCard style={{ marginRight: '0.5rem', color: '#64748b' }} />
+                    {p.numeroDocumento || "—"}
+                  </span>
+                </div>
+
+                {/* Columna: Género */}
+                <div className="table-card-column">
+                  <span className="table-card-column-label">Género</span>
+                  <span className={`table-card-badge ${
+                    p.genero === 'M' ? 'badge-masculino' : 'badge-femenino'
+                  }`}>
+                    {p.genero === 'M' ? 'Masculino' : 'Femenino'}
+                  </span>
+                </div>
+
+                {/* Columna: ID */}
+                <div className="table-card-column">
+                  <span className="table-card-column-label">ID</span>
+                  <span className="table-card-column-value">#{p.idPaciente}</span>
+                </div>
+              </div>
+
+              {/* Acciones */}
+              <div className="table-card-actions">
+                <button
+                  className="btn-action btn-edit"
+                  onClick={() => abrirModal("editar", p)}
+                  title="Editar"
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  className="btn-action btn-delete"
+                  onClick={() => eliminarPaciente(p.idPaciente)}
+                  title="Eliminar"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* MODAL */}
@@ -291,8 +320,7 @@ function Pacientes() {
                 onChange={handleChange}
               />
               <Form.Text muted>
-                Este campo solo se usa de forma visual (no se guarda en base de
-                datos).
+                Este campo solo se usa de forma visual (no se guarda en base de datos).
               </Form.Text>
             </Form.Group>
 
