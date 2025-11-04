@@ -65,10 +65,11 @@ public class TriageService {
     // Buscar triages por nivel de urgencia
     public List<TriageDTO> listarPorNivel(Integer idNivel) {
         List<Triage> triages = triageRepository.findByNivelUrgencia_IdNivelUrgencia(idNivel);
-        if (triages.isEmpty()) {
-            throw new RecursoNoEncontradoException("No se encontraron triages con ese nivel de urgencia.");
-        }
-        return triages.stream().map(this::toDTO).collect(Collectors.toList());
+
+        // En lugar de lanzar error, devolvemos lista vacía
+        return triages.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     // Buscar triages por médico

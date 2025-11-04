@@ -1,0 +1,33 @@
+.sintomas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sintoma-chip {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.sintoma-chip:hover {
+  background-color: #e2e8f0;
+  transform: scale(1.05);
+}
+
+.sintoma-chip.selected {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #2563eb;
+}
+
+.sintoma-badge {
+  margin-right: 5px;
+  background-color: #38bdf8 !important;
+}

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Form, Spinner, InputGroup } from "react-bootstrap";
+import { Button, Modal, Form, Spinner, InputGroup, Badge } from "react-bootstrap";
 import SintomaService from "../services/SintomaService";
+import EnfermedadService from "../services/EnfermedadService";
+import "../styles/enfermedades.css"; 
 
 function Sintomas() {
   const [sintomas, setSintomas] = useState([]);
+  const [enfermedadesDisponibles, setEnfermedadesDisponibles] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
@@ -13,33 +16,42 @@ function Sintomas() {
   const [formData, setFormData] = useState({
     nombreSintoma: "",
     descripcion: "",
+    enfermedadesAsociadas: [],
   });
 
-  const cargarSintomas = async () => {
+  const cargarDatos = async () => {
     try {
       setLoading(true);
-      const data = await SintomaService.listar();
-      setSintomas(data);
+      const [dataSin, dataEnf] = await Promise.all([
+        SintomaService.listar(),
+        EnfermedadService.listar(),
+      ]);
+      setSintomas(dataSin);
+      setEnfermedadesDisponibles(dataEnf);
     } catch (err) {
-      console.error("❌ Error al listar síntomas:", err);
+      console.error("❌ Error al cargar datos:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    cargarSintomas();
+    cargarDatos();
   }, []);
 
   const abrirModal = (modo, item = null) => {
     if (modo === "editar" && item) {
-      setFormData({ ...item });
+      setFormData({
+        ...item,
+        enfermedadesAsociadas: item.enfermedadesAsociadas || [],
+      });
       setModoEdicion(true);
       setSintomaEditando(item);
     } else {
       setFormData({
         nombreSintoma: "",
         descripcion: "",
+        enfermedadesAsociadas: [],
       });
       setModoEdicion(false);
       setSintomaEditando(null);
@@ -55,7 +67,7 @@ function Sintomas() {
         await SintomaService.registrar(formData);
       }
       setShowModal(false);
-      cargarSintomas();
+      cargarDatos();
     } catch (err) {
       console.error("❌ Error al guardar síntoma:", err);
       alert("Error al registrar o actualizar el síntoma.");
@@ -66,7 +78,7 @@ function Sintomas() {
     if (window.confirm("¿Deseas eliminar este síntoma?")) {
       try {
         await SintomaService.eliminar(id);
-        cargarSintomas();
+        cargarDatos();
       } catch (err) {
         console.error("❌ Error al eliminar síntoma:", err);
       }
@@ -75,19 +87,26 @@ function Sintomas() {
 
   const buscarPorPalabra = async () => {
     if (!busqueda.trim()) {
-      cargarSintomas();
+      cargarDatos();
       return;
     }
     try {
       const data = await SintomaService.buscarPorPalabraClave(busqueda.trim());
       setSintomas(data);
     } catch (err) {
-      console.error("❌ Error al buscar síntomas:", err);
+      alert("No se encontraron síntomas con ese término.");
     }
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleEnfermedadChange = (idEnfermedad) => {
+    const seleccionadas = formData.enfermedadesAsociadas.includes(idEnfermedad)
+      ? formData.enfermedadesAsociadas.filter((id) => id !== idEnfermedad)
+      : [...formData.enfermedadesAsociadas, idEnfermedad];
+    setFormData({ ...formData, enfermedadesAsociadas: seleccionadas });
   };
 
   return (
@@ -117,12 +136,13 @@ function Sintomas() {
           <p className="mt-2">Cargando síntomas...</p>
         </div>
       ) : (
-        <table className="table table-striped align-middle">
+        <table className="table table-striped align-middle table-hover shadow-sm rounded">
           <thead className="table-primary">
             <tr>
               <th>ID</th>
               <th>Nombre del Síntoma</th>
               <th>Descripción</th>
+              <th>Enfermedades Asociadas</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -133,6 +153,22 @@ function Sintomas() {
                   <td>{s.idSintoma}</td>
                   <td>{s.nombreSintoma}</td>
                   <td>{s.descripcion}</td>
+                  <td>
+                    {s.enfermedadesAsociadas && s.enfermedadesAsociadas.length > 0 ? (
+                      s.enfermedadesAsociadas.map((id) => {
+                        const enf = enfermedadesDisponibles.find(
+                          (x) => x.idEnfermedad === id
+                        );
+                        return (
+                          <Badge bg="secondary" key={id} className="sintoma-badge">
+                            {enf ? enf.nombreEnfermedad : "—"}
+                          </Badge>
+                        );
+                      })
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
                   <td>
                     <Button
                       variant="warning"
@@ -154,7 +190,7 @@ function Sintomas() {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center text-muted">
+                <td colSpan="5" className="text-center text-muted">
                   No hay síntomas registrados.
                 </td>
               </tr>
@@ -164,11 +200,9 @@ function Sintomas() {
       )}
 
       {/* Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>
-            {modoEdicion ? "Editar Síntoma" : "Registrar Síntoma"}
-          </Modal.Title>
+          <Modal.Title>{modoEdicion ? "Editar Síntoma" : "Registrar Síntoma"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -180,7 +214,8 @@ function Sintomas() {
                 onChange={handleChange}
               />
             </Form.Group>
-            <Form.Group>
+
+            <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
               <Form.Control
                 as="textarea"
@@ -189,6 +224,25 @@ function Sintomas() {
                 value={formData.descripcion}
                 onChange={handleChange}
               />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Asociar Enfermedades</Form.Label>
+              <div className="sintomas-container">
+                {enfermedadesDisponibles.map((e) => (
+                  <div
+                    key={e.idEnfermedad}
+                    className={`sintoma-chip ${
+                      formData.enfermedadesAsociadas.includes(e.idEnfermedad)
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() => handleEnfermedadChange(e.idEnfermedad)}
+                  >
+                    {e.nombreEnfermedad}
+                  </div>
+                ))}
+              </div>
             </Form.Group>
           </Form>
         </Modal.Body>

@@ -19,16 +19,38 @@ import "../styles/sidebar.css";
 function Sidebar() {
   const location = useLocation();
 
-  const menuItems = [
-    { path: "/dashboard", label: "Dashboard", icon: <FaHome /> },
-    { path: "/pacientes", label: "Pacientes", icon: <FaUserInjured /> },
-    { path: "/personal-medico", label: "Personal Médico", icon: <FaUserMd /> },
-    { path: "/sintomas", label: "Síntomas", icon: <FaBug /> },
-    { path: "/enfermedades", label: "Enfermedades", icon: <FaFileMedical /> },
-    { path: "/niveles-urgencia", label: "Niveles Urgencia", icon: <FaExclamationTriangle /> },
-    { path: "/visitas", label: "Visitas", icon: <FaHeartbeat /> },
-    { path: "/triages", label: "Triages", icon: <FaChartPie /> },
-    { path: "/diagnosticos", label: "Diagnósticos", icon: <FaNotesMedical /> },
+  // Menú organizado por secciones
+  const menuSections = [
+    {
+      title: "General",
+      items: [
+        { path: "/dashboard", label: "Dashboard", icon: <FaHome /> },
+      ]
+    },
+        {
+      title: "Atención Médica",
+      items: [
+        { path: "/visitas", label: "Visitas", icon: <FaHeartbeat /> },
+        { path: "/triages", label: "Triages", icon: <FaChartPie /> },
+        { path: "/diagnosticos", label: "Diagnósticos", icon: <FaNotesMedical /> },
+      ]
+    },
+    {
+      title: "Gestión de Personal",
+      items: [
+        { path: "/pacientes", label: "Pacientes", icon: <FaUserInjured /> },
+        { path: "/personal-medico", label: "Personal Médico", icon: <FaUserMd /> },
+      ]
+    },
+    {
+      title: "Base de Conocimientos",
+      items: [
+        { path: "/sintomas", label: "Síntomas", icon: <FaBug /> },
+        { path: "/enfermedades", label: "Enfermedades", icon: <FaFileMedical /> },
+        { path: "/niveles-urgencia", label: "Niveles Urgencia", icon: <FaExclamationTriangle /> },
+      ]
+    }
+
   ];
 
   return (
@@ -41,19 +63,33 @@ function Sidebar() {
         <h4 className="sbctu-brand-name">SBCTU</h4>
       </div>
 
-      {/* Navigation Menu */}
+      {/* Navigation Menu con secciones */}
       <nav className="sbctu-sidebar-nav">
-        {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`sbctu-nav-link ${
-              location.pathname === item.path ? "active" : ""
-            }`}
-          >
-            <span className="sbctu-nav-icon">{item.icon}</span>
-            <span className="sbctu-nav-label">{item.label}</span>
-          </Link>
+        {menuSections.map((section, sectionIdx) => (
+          <div key={sectionIdx} className="sbctu-nav-section">
+            {/* Título de la sección */}
+            <div className="sbctu-section-title">
+              {section.title}
+            </div>
+            
+            {/* Items de la sección */}
+            <div className="sbctu-section-items">
+              {section.items.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`sbctu-nav-link ${
+                    location.pathname === item.path ? "active" : ""
+                  }`}
+                >
+                  <span className="sbctu-nav-icon">{item.icon}</span>
+                  <span className="sbctu-nav-label">{item.label}</span>
+                  {/* Contador opcional - puedes agregarlo después */}
+                  {/* <span className="sbctu-nav-count">3</span> */}
+                </Link>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
 
@@ -61,7 +97,7 @@ function Sidebar() {
       <div className="sbctu-sidebar-upgrade">
         <div className="sbctu-upgrade-content">
           <h6>Acceso a Sugerencias</h6>
-          <p>Obtén acceso a un sistema mas personalizado</p>
+          <p>Obtén acceso a un sistema más personalizado</p>
           <button className="sbctu-upgrade-btn">Mejorar Plan</button>
         </div>
       </div>
@@ -70,7 +106,7 @@ function Sidebar() {
       <div className="sbctu-sidebar-footer">
         <Link to="/settings" className="sbctu-footer-link">
           <FaCog />
-          <span>Configuracion</span>
+          <span>Configuración</span>
         </Link>
         <Link to="/help" className="sbctu-footer-link">
           <FaQuestionCircle />
