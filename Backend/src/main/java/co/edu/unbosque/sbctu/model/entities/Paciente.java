@@ -48,7 +48,7 @@ public class Paciente implements Serializable {
 
     public Paciente(String primerNombre, String segundoNombre, String primerApellido,
                     String segundoApellido, LocalDate fechaNacimiento, String genero,
-                    String direccion, String correo) {
+                    String direccion, String correo, String numeroDocumento) {
         this.primerNombre = primerNombre;
         this.segundoNombre = segundoNombre;
         this.primerApellido = primerApellido;

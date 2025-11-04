@@ -124,7 +124,7 @@ function Dashboard() {
                   </div>
                   <h6 className="metric-title">{metric.title}</h6>
                   <h2 className="metric-value">{metric.value?.toLocaleString() || 0}</h2>
-                  <p className="metric-subtitle">from last month</p>
+                  <p className="metric-subtitle">desde el mes pasado</p>
                 </Card.Body>
               </Card>
             </Col>
