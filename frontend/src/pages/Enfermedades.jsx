@@ -34,7 +34,7 @@ function Enfermedades() {
       setEnfermedades(dataEnf);
       setSintomasDisponibles(dataSin);
     } catch (err) {
-      console.error("❌ Error al cargar datos:", err);
+      console.error(" Error al cargar datos:", err);
     } finally {
       setLoading(false);
     }
@@ -274,9 +274,8 @@ function Enfermedades() {
                 {sintomasDisponibles.map((s) => (
                   <div
                     key={s.idSintoma}
-                    className={`sintoma-chip ${
-                      formData.sintomasAsociados.includes(s.idSintoma) ? "selected" : ""
-                    }`}
+                    className={`sintoma-chip ${formData.sintomasAsociados.includes(s.idSintoma) ? "selected" : ""
+                      }`}
                     onClick={() => handleSintomaChange(s.idSintoma)}
                   >
                     {s.nombreSintoma}
