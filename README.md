@@ -215,9 +215,9 @@ El dashboard incluye:
 ## 🧑‍💻 9. Autores y Créditos
 
 **Equipo de desarrollo:**  
-- 👨‍💻 Miguel — Full Stack Developer  
-- 👩‍💻 [Nombre compañera] — Frontend Developer  
-- 🎓 Proyecto académico – SENA / Universidad El Bosque  
+- 👨‍💻 Maria Paula Marín — Full Stack Developer  
+- 👩‍💻 Laura Camila Torres — Frontend Developer  
+- 🎓 Proyecto académico – Universidad El Bosque  
 
 ---
 
