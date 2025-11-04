@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, Spinner } from "react-bootstrap";
 import { FaUserMd, FaPlus, FaEdit, FaTrash, FaEnvelope, FaIdBadge, FaBriefcase } from "react-icons/fa";
 import PersonalMedicoService from "../services/PersonalMedicoService";
+import Notify from "../components/Notify";
 import "../styles/table-cards.css";
 
 function PersonalMedico() {
@@ -10,6 +11,12 @@ function PersonalMedico() {
   const [loading, setLoading] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [personalEditando, setPersonalEditando] = useState(null);
+
+  const [notify, setNotify] = useState({
+    show: false,
+    message: "",
+    type: "info",
+  });
 
   const [formData, setFormData] = useState({
     primerNombre: "",
@@ -61,16 +68,103 @@ function PersonalMedico() {
 
   const guardarPersonal = async () => {
     try {
+      // Validaciones
+      if (!formData.primerNombre || !formData.primerApellido) {
+        setNotify({
+          show: true,
+          message: "Por favor completa el nombre y apellido del personal.",
+          type: "warning",
+        });
+        return;
+      }
+
+      if (!formData.numeroLicencia) {
+        setNotify({
+          show: true,
+          message: "El número de licencia es obligatorio.",
+          type: "warning",
+        });
+        return;
+      }
+
+      if (!formData.correoInstitucional) {
+        setNotify({
+          show: true,
+          message: "El correo institucional es obligatorio.",
+          type: "warning",
+        });
+        return;
+      }
+
+      // Validar formato de correo
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.correoInstitucional)) {
+        setNotify({
+          show: true,
+          message: "Por favor ingresa un correo electrónico válido.",
+          type: "warning",
+        });
+        return;
+      }
+
+      // Validar duplicado de correo
+      const existeCorreo = personal.some(
+        (p) => 
+          p.correoInstitucional.toLowerCase() === formData.correoInstitucional.toLowerCase() &&
+          (!modoEdicion || p.idPersonal !== personalEditando.idPersonal)
+      );
+      
+      if (existeCorreo) {
+        setNotify({
+          show: true,
+          message: "El correo institucional ya está registrado en otro personal médico.",
+          type: "warning",
+        });
+        return;
+      }
+
+      // Validar duplicado de número de licencia
+      const existeLicencia = personal.some(
+        (p) => 
+          p.numeroLicencia === formData.numeroLicencia &&
+          (!modoEdicion || p.idPersonal !== personalEditando.idPersonal)
+      );
+      
+      if (existeLicencia) {
+        setNotify({
+          show: true,
+          message: "El número de licencia ya está registrado.",
+          type: "warning",
+        });
+        return;
+      }
+
+      // Guardar
       if (modoEdicion) {
         await PersonalMedicoService.actualizar(personalEditando.idPersonal, formData);
+        setNotify({
+          show: true,
+          message: "Personal médico actualizado correctamente.",
+          type: "success",
+        });
       } else {
         await PersonalMedicoService.registrar(formData);
+        setNotify({
+          show: true,
+          message: "Personal médico registrado exitosamente.",
+          type: "success",
+        });
       }
+      
       setShowModal(false);
       cargarPersonal();
     } catch (err) {
       console.error("❌ Error al guardar personal médico:", err);
-      alert("Error al registrar o actualizar el personal médico.");
+      setNotify({
+        show: true,
+        message: "Error al registrar o actualizar el personal médico.",
+        type: "error",
+      });
     }
   };
 
@@ -78,9 +172,19 @@ function PersonalMedico() {
     if (window.confirm("¿Deseas eliminar este registro?")) {
       try {
         await PersonalMedicoService.eliminar(id);
+        setNotify({
+          show: true,
+          message: "Personal médico eliminado correctamente.",
+          type: "success",
+        });
         cargarPersonal();
       } catch (err) {
         console.error("❌ Error al eliminar personal médico:", err);
+        setNotify({
+          show: true,
+          message: "Error al eliminar el personal médico.",
+          type: "error",
+        });
       }
     }
   };
@@ -110,6 +214,14 @@ function PersonalMedico() {
           </button>
         </div>
       </div>
+
+      {/* Notify */}
+      <Notify
+        show={notify.show}
+        onClose={() => setNotify({ ...notify, show: false })}
+        message={notify.message}
+        type={notify.type}
+      />
 
       {/* Loading */}
       {loading ? (

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Form, Spinner, InputGroup, Badge } from "react-bootstrap";
+import { Button, Modal, Form, Spinner, InputGroup } from "react-bootstrap";
+import { FaBug, FaPlus, FaEdit, FaTrash, FaSearch, FaFileMedical } from "react-icons/fa";
 import SintomaService from "../services/SintomaService";
 import EnfermedadService from "../services/EnfermedadService";
-import "../styles/enfermedades.css"; 
+import "../styles/table-cards.css";
+import "../styles/enfermedades.css";
 
 function Sintomas() {
   const [sintomas, setSintomas] = useState([]);
@@ -19,21 +21,21 @@ function Sintomas() {
     enfermedadesAsociadas: [],
   });
 
-  const cargarDatos = async () => {
-    try {
-      setLoading(true);
-      const [dataSin, dataEnf] = await Promise.all([
-        SintomaService.listar(),
-        EnfermedadService.listar(),
-      ]);
-      setSintomas(dataSin);
-      setEnfermedadesDisponibles(dataEnf);
-    } catch (err) {
-      console.error("❌ Error al cargar datos:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const cargarDatos = async () => {
+  try {
+    setLoading(true);
+    const [dataSin, dataEnf] = await Promise.all([
+      SintomaService.listar(),
+      EnfermedadService.listar(),
+    ]);
+    setSintomas(dataSin);
+    setEnfermedadesDisponibles(dataEnf);
+  } catch (err) {
+    console.error("❌ Error al cargar datos:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     cargarDatos();
@@ -109,94 +111,126 @@ function Sintomas() {
     setFormData({ ...formData, enfermedadesAsociadas: seleccionadas });
   };
 
+  // Colores aleatorios para avatares
+  const avatarColors = ['avatar-blue', 'avatar-green', 'avatar-purple', 'avatar-orange', 'avatar-pink'];
+  const getAvatarColor = (id) => avatarColors[id % avatarColors.length];
+
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-center">Gestión de Síntomas</h2>
+    <div className="table-cards-container">
+      {/* Header */}
+      <div className="table-cards-header">
+        <h2 className="table-cards-title">Gestión de Síntomas</h2>
+        <div className="table-cards-actions">
+          {/* Buscador */}
+          <div className="search-box">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Buscar síntoma..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && buscarPorPalabra()}
+            />
+            <button className="search-btn" onClick={buscarPorPalabra}>
+              <FaSearch />
+            </button>
+          </div>
 
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <Button variant="success" onClick={() => abrirModal("nuevo")}>
-          + Nuevo Síntoma
-        </Button>
-
-        <InputGroup style={{ width: "300px" }}>
-          <Form.Control
-            placeholder="Buscar síntoma..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-          <Button variant="primary" onClick={buscarPorPalabra}>
-            Buscar
-          </Button>
-        </InputGroup>
+          <button className="btn-add" onClick={() => abrirModal("nuevo")}>
+            <FaPlus /> Nuevo Síntoma
+          </button>
+        </div>
       </div>
 
+      {/* Loading */}
       {loading ? (
-        <div className="text-center mt-4">
-          <Spinner animation="border" />
-          <p className="mt-2">Cargando síntomas...</p>
+        <div className="table-cards-loading">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3" style={{ color: '#64748b' }}>Cargando síntomas...</p>
+        </div>
+      ) : sintomas.length === 0 ? (
+        /* Estado vacío */
+        <div className="table-cards-empty">
+          <div className="table-cards-empty-icon">
+            <FaBug />
+          </div>
+          <h5 className="table-cards-empty-title">No hay síntomas registrados</h5>
+          <p className="table-cards-empty-text">
+            {busqueda ? 'No se encontraron síntomas con ese término' : 'Comienza agregando el primer síntoma'}
+          </p>
         </div>
       ) : (
-        <table className="table table-striped align-middle table-hover shadow-sm rounded">
-          <thead className="table-primary">
-            <tr>
-              <th>ID</th>
-              <th>Nombre del Síntoma</th>
-              <th>Descripción</th>
-              <th>Enfermedades Asociadas</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sintomas.length > 0 ? (
-              sintomas.map((s) => (
-                <tr key={s.idSintoma}>
-                  <td>{s.idSintoma}</td>
-                  <td>{s.nombreSintoma}</td>
-                  <td>{s.descripcion}</td>
-                  <td>
+        /* Lista de Cards */
+        <div className="table-cards-list">
+          {sintomas.map((s) => (
+            <div key={s.idSintoma} className="table-card-item">
+              {/* Avatar */}
+              <div className={`table-card-avatar ${getAvatarColor(s.idSintoma)}`}>
+                <FaBug />
+              </div>
+
+              {/* Contenido */}
+              <div className="table-card-content">
+                {/* Información principal */}
+                <div className="table-card-info" style={{ flex: '2' }}>
+                  <h6 className="table-card-name">{s.nombreSintoma}</h6>
+                  <p className="table-card-detail" style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: '300px'
+                  }}>
+                    {s.descripcion}
+                  </p>
+                </div>
+
+                {/* Columna: Enfermedades Asociadas */}
+                <div className="table-card-column" style={{ flex: '2', minWidth: '200px' }}>
+                  <span className="table-card-column-label">Enfermedades Asociadas</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.25rem' }}>
                     {s.enfermedadesAsociadas && s.enfermedadesAsociadas.length > 0 ? (
                       s.enfermedadesAsociadas.map((id) => {
-                        const enf = enfermedadesDisponibles.find(
-                          (x) => x.idEnfermedad === id
-                        );
+                        const enf = enfermedadesDisponibles.find((x) => x.idEnfermedad === id);
                         return (
-                          <Badge bg="secondary" key={id} className="sintoma-badge">
+                          <span key={id} className="mini-badge">
+                            <FaFileMedical style={{ fontSize: '0.65rem', marginRight: '0.25rem' }} />
                             {enf ? enf.nombreEnfermedad : "—"}
-                          </Badge>
+                          </span>
                         );
                       })
                     ) : (
-                      <span className="text-muted">—</span>
+                      <span style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Sin asociar</span>
                     )}
-                  </td>
-                  <td>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => abrirModal("editar", s)}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => eliminarSintoma(s.idSintoma)}
-                    >
-                      Eliminar
-                    </Button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center text-muted">
-                  No hay síntomas registrados.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                  </div>
+                </div>
+
+                {/* Columna: ID */}
+                <div className="table-card-column">
+                  <span className="table-card-column-label">ID</span>
+                  <span className="table-card-column-value">#{s.idSintoma}</span>
+                </div>
+              </div>
+
+              {/* Acciones */}
+              <div className="table-card-actions">
+                <button
+                  className="btn-action btn-edit"
+                  onClick={() => abrirModal("editar", s)}
+                  title="Editar"
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  className="btn-action btn-delete"
+                  onClick={() => eliminarSintoma(s.idSintoma)}
+                  title="Eliminar"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Modal */}
@@ -232,11 +266,10 @@ function Sintomas() {
                 {enfermedadesDisponibles.map((e) => (
                   <div
                     key={e.idEnfermedad}
-                    className={`sintoma-chip ${
-                      formData.enfermedadesAsociadas.includes(e.idEnfermedad)
+                    className={`sintoma-chip ${formData.enfermedadesAsociadas.includes(e.idEnfermedad)
                         ? "selected"
                         : ""
-                    }`}
+                      }`}
                     onClick={() => handleEnfermedadChange(e.idEnfermedad)}
                   >
                     {e.nombreEnfermedad}

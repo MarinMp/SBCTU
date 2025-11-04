@@ -325,3 +325,96 @@
     font-size: 0.75rem;
   }
 }
+
+/* === Estilos adicionales para Síntomas === */
+
+/* Search Box */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  width: 250px;
+  background: transparent;
+  color: #1e293b;
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+}
+
+.search-btn {
+  background: #f8fafc;
+  border: none;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-btn:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+/* Mini Badges para enfermedades */
+.mini-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Ajuste para cards con más contenido */
+.table-card-item .table-card-content {
+  gap: 1.5rem;
+}
+
+/* Responsive para search box */
+@media (max-width: 768px) {
+  .table-cards-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .table-cards-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+}
